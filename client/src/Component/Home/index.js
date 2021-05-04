@@ -11,6 +11,10 @@ import Badge from '@material-ui/core/Badge';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import axios from 'axios';
+import { useToast } from '@chakra-ui/react';
 
 const useStyles = makeStyles((theme) => ({
     logoStyles:{
@@ -28,6 +32,8 @@ const useStyles = makeStyles((theme) => ({
 
 function Home(){
     const classes = useStyles();
+    const toast = useToast();
+    const toast_id = "id"
 
     const [open, setOpen] = useState(false);
 
@@ -35,6 +41,9 @@ function Home(){
     const [ cartCount, setCartCount ] = useState(0);
 
     const [dialogContent, setDialogContent] = useState("");
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const handleOpen = (e, type) => {
         switch (type) {
@@ -52,6 +61,27 @@ function Home(){
         setDialogContent("");
     }
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        axios.post('http://localhost:3001/user/login',{
+            email: email, password: password
+        })
+        .then((res) => {
+
+        })
+        .catch(err => {
+            if(!toast.isActive(toast_id)){
+                toast({
+                    id: toast_id,
+                    description: "Login Failed. Try Again",
+                    duration: 3000,
+                    position: "top-right"
+                })
+            }
+        })
+     }
+
     return(
         <Section>
             <AppBar className={classes.nav}>
@@ -68,8 +98,30 @@ function Home(){
                 {dialogContent === "login" ? <>
                     <DialogTitle>Login To Access Cart</DialogTitle>
                     <DialogContent >
-                        <form>
-
+                        <form onSubmit={handleSubmit}>
+                            <TextField 
+                                required
+                                fullWidth
+                                type="email"
+                                label="Email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={e=>setEmail(e.target.value)}
+                                style={{marginBottom: '7px'}}
+                            />
+                            <TextField 
+                                required
+                                fullWidth
+                                type="password"
+                                label="Password"
+                                placeholder="Enter the password"
+                                value={password}
+                                onChange={e=>setPassword(e.target.value)}
+                                style={{marginBottom: '7px'}}
+                            />
+                            <Button fullWidth type="submit" style={{backgroundColor: '#202950', color: 'white'}}>
+                                Login
+                            </Button>
                         </form>
                     </DialogContent>
                 </>
