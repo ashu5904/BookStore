@@ -15,7 +15,7 @@ const authRouter = require('./routes/auth.router');
 const productRouter = require('./routes/product.router');
 
 app.use(cors({
-    origin: "https://bookstore-ashutosh.herokuapp.com"
+    origin: "http://bookstore-ashutosh.herokuapp.com"
 }))
 
 app.use(express.json());
