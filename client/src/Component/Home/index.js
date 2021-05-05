@@ -78,7 +78,7 @@ function Home(){
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        axios.post('http://localhost:3001/user/login',{
+        axios.post(`${process.env.REACT_APP_AUTH}/login`,{
             email: email, password: password
         })
         .then((res) => {
@@ -124,7 +124,7 @@ function Home(){
 
     const handleCartAdd = (e) => {
 
-        axios.post('http://localhost:3001/product/addCart', {
+        axios.post(`${process.env.REACT_APP_PRODUCT}/addCart`, {
             userId: localStorage.getItem('user'),
             product: productId
         })
@@ -147,7 +147,7 @@ function Home(){
 
     useEffect(() => {
 
-        axios.post('http://localhost:3001/product/fetch')
+        axios.post(`${process.env.REACT_APP_PRODUCT}/fetch`)
         .then(res =>{
             setFetchedData(res.data.products);
         })
