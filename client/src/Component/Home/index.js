@@ -110,9 +110,9 @@ function Home(){
     }
 
     useEffect(() => {
-        fetch('https://fakestoreapi.com/products?limit=10')
+        axios.post('http://localhost:3001/product/fetch')
         .then(res =>{
-            console.log(res.json());
+            setFetchedData(res.data.products);
         })
         .catch(err => {
             if(!toast.isActive(toast_id)){
@@ -124,7 +124,7 @@ function Home(){
                 })
             }
         })
-    }, [toast, fetchedData])
+    }, [toast])
 
     return(
         <Section>
