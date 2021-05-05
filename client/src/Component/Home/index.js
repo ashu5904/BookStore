@@ -78,7 +78,7 @@ function Home(){
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        axios.post(`https://bookstore-ashutosh.herokuapp.com:${process.env.PORT}/user/login`,{
+        axios.post(`https://bookstore-ashutosh.herokuapp.com:80/user/login`,{
             email: email, password: password
         })
         .then((res) => {
@@ -124,7 +124,7 @@ function Home(){
 
     const handleCartAdd = (e) => {
 
-        axios.post(`https://bookstore-ashutosh.herokuapp.com:${process.env.PORT}/product/addCart`, {
+        axios.post(`https://bookstore-ashutosh.herokuapp.com:80/product/addCart`, {
             userId: localStorage.getItem('user'),
             product: productId
         })
@@ -147,7 +147,7 @@ function Home(){
 
     useEffect(() => {
 
-        axios.post(`https://bookstore-ashutosh.herokuapp.com:${process.env.PORT}/product/fetch`)
+        axios.post(`https://bookstore-ashutosh.herokuapp.com:80/product/fetch`)
         .then(res =>{
             setFetchedData(res.data.products);
         })
