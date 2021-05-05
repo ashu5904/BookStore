@@ -7,3 +7,9 @@ export const Section = styled.div`
     width: 100%;
     height: 100vh;
 `
+
+export const Holder = styled.div`
+    display: grid;
+    place-items: center;
+    width: 100%;
+`

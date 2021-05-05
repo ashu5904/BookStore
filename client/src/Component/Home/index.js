@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Section 
+    Section,
+    Holder
 } from './HomeComponents.js';
 import { makeStyles } from '@material-ui/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -13,6 +14,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 
@@ -45,6 +48,8 @@ function Home(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [fetchedData, setFetchedData] = useState([]);
+
     const handleOpen = (e, type) => {
         switch (type) {
             case "login":
@@ -68,7 +73,29 @@ function Home(){
             email: email, password: password
         })
         .then((res) => {
-
+            if(res.data.response === 1){
+                if(!toast.isActive(toast_id)){
+                    toast({
+                        id: toast_id,
+                        description: "Login Successful",
+                        duration: 3000,
+                        position: "top-right"
+                    })
+                }
+                setLogin(true);
+                handleClose();
+                setEmail("");
+                setPassword("");
+            } else {
+                if(!toast.isActive(toast_id)){
+                    toast({
+                        id: toast_id,
+                        description: "Incorrect Credentials. Try again",
+                        duration: 3000,
+                        position: "top-right"
+                    })
+                }
+            }
         })
         .catch(err => {
             if(!toast.isActive(toast_id)){
@@ -80,7 +107,24 @@ function Home(){
                 })
             }
         })
-     }
+    }
+
+    useEffect(() => {
+        fetch('https://fakestoreapi.com/products?limit=10')
+        .then(res =>{
+            console.log(res.json());
+        })
+        .catch(err => {
+            if(!toast.isActive(toast_id)){
+                toast({
+                    id: toast_id,
+                    description: "Failed Fetching Data",
+                    duration: 3000,
+                    position: "top-right"
+                })
+            }
+        })
+    }, [toast, fetchedData])
 
     return(
         <Section>
@@ -94,6 +138,25 @@ function Home(){
                     </Badge>
                 </IconButton>
             </AppBar>
+            <Holder>
+                <div style={{color: 'white'}}>
+                    <Typography variant="h3">Book Store</Typography>
+                    <Typography variant="h6">A Destination For All Book Lovers</Typography>
+                </div>
+                <Grid container>
+                    {
+                        fetchedData.map((element, index) => {
+                            return (
+                                <Grid item sm={12} md={4} lg={3} key={index}>
+                                    <Paper elevation={3}>
+                                        <Typography variant="h4">{element.title}</Typography>
+                                    </Paper>
+                                </Grid>
+                            )
+                        })
+                    }
+                </Grid>
+            </Holder>
             <Dialog open={open} fullWidth disableEscapeKeyDown onClose={(e) => handleClose()}>
                 {dialogContent === "login" ? <>
                     <DialogTitle>Login To Access Cart</DialogTitle>
