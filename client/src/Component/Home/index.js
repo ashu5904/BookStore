@@ -152,6 +152,7 @@ function Home(){
             setFetchedData(res.data.products);
         })
         .catch(err => {
+            console.log(err);
             if(!toast.isActive(toast_id)){
                 toast({
                     id: toast_id,
