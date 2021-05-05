@@ -12,6 +12,7 @@ import Badge from '@material-ui/core/Badge';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -49,12 +50,19 @@ function Home(){
     const [password, setPassword] = useState("");
 
     const [fetchedData, setFetchedData] = useState([]);
+    const [productId, setProductId] = useState("");
+    const [cart, setCart] = useState("")
 
-    const handleOpen = (e, type) => {
+    const handleOpen = (e, type, id) => {
         switch (type) {
             case "login":
                 setOpen(true);
                 setDialogContent("login")
+                break;
+            case "addCart":
+                setOpen(true);
+                setDialogContent("addCart");
+                setProductId(id);
                 break;
             default:
                 break;
@@ -64,6 +72,7 @@ function Home(){
     const handleClose = () => {
         setOpen(false);
         setDialogContent("");
+        setProductId("");
     }
 
     const handleSubmit = (e) => {
@@ -82,10 +91,14 @@ function Home(){
                         position: "top-right"
                     })
                 }
+                localStorage.setItem('user', res.data.id);
                 setLogin(true);
+                setCartCount(res.data.cart);
+                setCart(res.data.cartItem);
                 handleClose();
                 setEmail("");
                 setPassword("");
+                
             } else {
                 if(!toast.isActive(toast_id)){
                     toast({
@@ -109,7 +122,31 @@ function Home(){
         })
     }
 
+    const handleCartAdd = (e) => {
+
+        axios.post('http://localhost:3001/product/addCart', {
+            userId: localStorage.getItem('user'),
+            product: productId
+        })
+        .then((res) => {
+            handleClose();
+            setCartCount(res.data.result.cart.length)
+            setCart(res.data.result.cart)
+        })
+        .catch(err => {
+            if(!toast.isActive(toast_id)){
+                toast({
+                    id: toast_id,
+                    description: "Adding To Cart Failed",
+                    duration: 3000,
+                    position: "top-right"
+                })
+            }
+        })
+    }
+
     useEffect(() => {
+
         axios.post('http://localhost:3001/product/fetch')
         .then(res =>{
             setFetchedData(res.data.products);
@@ -133,29 +170,46 @@ function Home(){
                     Book Store
                 </Typography>
                 <IconButton color="inherit" onClick={login ? null : e=> handleOpen(e, "login")}>
-                    <Badge badgeContent={login ? cartCount : 0} color="secondary">
+                    <Badge badgeContent={cartCount} color="secondary">
                         <ShoppingCartIcon />
                     </Badge>
                 </IconButton>
             </AppBar>
             <Holder>
-                <div style={{color: 'white'}}>
-                    <Typography variant="h3">Book Store</Typography>
-                    <Typography variant="h6">A Destination For All Book Lovers</Typography>
+                <div style={{color: 'white', marginBottom: '20px', marginTop: '75px'}}>
+                    <Typography variant="h2">Book Store</Typography>
+                    <Typography variant="h4">A Destination For All Book Lovers</Typography>
                 </div>
-                <Grid container>
-                    {
-                        fetchedData.map((element, index) => {
-                            return (
-                                <Grid item sm={12} md={4} lg={3} key={index}>
-                                    <Paper elevation={3}>
-                                        <Typography variant="h4">{element.title}</Typography>
-                                    </Paper>
-                                </Grid>
-                            )
-                        })
-                    }
-                </Grid>
+                <div style={{padding: '10px'}}>
+                    <Grid container spacing={2}>
+                        {
+                            fetchedData.map((element, index) => {
+                                return (
+                                    <Grid item sm={12} md={4} lg={3} key={index} style={{height:'600px', padding: '10px'}}>
+                                        <Paper elevation={3} style={{padding: '7px', height: '100%', display: 'flex', flexDirection:'column', justifyContent: 'space-between'}}>
+                                            <img src={require(`../../images/${index + 1}.jpg`).default} alt="book" style={{width: '100%', height: '300px'}} />
+                                            <div>
+                                                <Typography variant="h5">{element.title}</Typography>
+                                                <Typography variant="h6">{element.des}</Typography>
+                                            </div>
+                                            {!cart.includes(element._id) ? 
+                                            <Button variant="contained" style={{color: 'white', backgroundColor:"#202950", marginBottom: '1px'}}
+                                                onClick={e=>handleOpen(e, "addCart", element._id)}
+                                            >
+                                                Add To Cart
+                                            </Button>
+                                            :
+                                            <Button variant="contained" style={{color: 'white', backgroundColor:"#202950", marginBottom: '1px'}}>
+                                                Remove From Cart
+                                            </Button>
+                                            }
+                                        </Paper>
+                                    </Grid>
+                                )
+                            })
+                        }
+                    </Grid>
+                </div>
             </Holder>
             <Dialog open={open} fullWidth disableEscapeKeyDown onClose={(e) => handleClose()}>
                 {dialogContent === "login" ? <>
@@ -188,7 +242,20 @@ function Home(){
                         </form>
                     </DialogContent>
                 </>
-                : null
+                :
+                dialogContent === "addCart" ? 
+                        <>
+                            <DialogTitle>Add To Cart</DialogTitle>
+                            <DialogContent>
+                                Do you want to add this item to your cart?
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleClose} style={{backgroundColor:'#202950', color: 'white'}}>Cancel</Button>
+                                <Button style={{backgroundColor:'#202950', color: 'white'}} onClick={handleCartAdd}>Add</Button>
+                            </DialogActions>
+                        </>
+                : 
+                null
                 }
             </Dialog>
         </Section>

@@ -5,11 +5,12 @@ export const Section = styled.div`
     place-items: center;
     background-color: #202950;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
 `
 
 export const Holder = styled.div`
-    display: grid;
+    display: flex;
+    flex-direction: column;
     place-items: center;
     width: 100%;
 `

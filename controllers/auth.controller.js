@@ -14,7 +14,10 @@ exports.loginController = (req, res) => {
         if(result.length === 1){
             if(result[0].password === password){
                 return res.status(200).json({
-                    response: 1
+                    response: 1,
+                    id: result[0]._id,
+                    cart: result[0].cart.length,
+                    cartItem: result[0].cart
                 })
             } else {
                 return res.status(200).json({
